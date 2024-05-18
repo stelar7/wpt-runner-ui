@@ -3,8 +3,8 @@
     <span>
       <b v-if="!props.goBack">{{ props.path[props.path.length - 1] }}</b>
       <template v-else>
-        <b v-if="!props.isRoot">> PARENT</b>
-        <b v-else>ROOT</b>
+        <b v-if="!props.isRoot">Parent:</b>
+        <b v-else>Total:</b>
       </template>
     </span>
     <div class="statContainer">
@@ -19,6 +19,8 @@
 <script setup lang="ts">
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import chroma from "chroma-js";
+import { computed } from "vue";
 const store = useStore();
 const props = defineProps(["path", "goBack", "isRoot"]);
 const counts = store.getters.countsForPath(props.path);
@@ -29,18 +31,42 @@ const pushPath = () => {
   router.push({ name: "RUNVIEW", params: { filepath: [...props.path] } });
 };
 
-let itemColor = "white";
-let itemBackground = "transparent";
-if (passPercent > 75) {
-  itemBackground = "rgba(144, 238, 144, 0.5)";
-} else if (passPercent > 50) {
-  itemBackground = "rgba(255, 255, 0, 0.5)";
-  itemColor = "black";
-} else if (passPercent > 25) {
-  itemBackground = "rgba(255, 165, 0, 0.5)";
-} else {
-  itemBackground = "rgba(240, 128, 128, 0.5)";
-}
+const itemGradient = computed(() => {
+  const gradients = [
+    {
+      weight: 100,
+      background: [50, 200, 25],
+    },
+    {
+      weight: 50,
+      background: [200, 170, 40],
+    },
+    {
+      weight: 0,
+      background: [200, 50, 25],
+    },
+  ];
+
+  const scale = chroma
+    .scale(gradients.map((g) => chroma(g.background)))
+    .domain(gradients.map((g) => g.weight))
+    .mode("lab");
+
+  const colorToUse = scale(passPercent);
+  const contrast = chroma.contrast(colorToUse, "white");
+
+  let textColor = "white";
+  if (contrast < 3) {
+    textColor = "black";
+  }
+
+  const colorString = colorToUse.css();
+
+  return {
+    color: textColor,
+    background: colorString,
+  };
+});
 </script>
 
 <style scoped>
@@ -49,8 +75,8 @@ if (passPercent > 75) {
   padding: 10px;
   border: 1px solid black;
 
-  background: v-bind("itemBackground");
-  color: v-bind("itemColor");
+  background: v-bind("itemGradient.background");
+  color: v-bind("itemGradient.color");
 
   &:hover {
     opacity: 0.5;

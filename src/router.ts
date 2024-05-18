@@ -1,15 +1,35 @@
-import { createMemoryHistory, createRouter } from "vue-router";
+import { createWebHistory, createRouter } from "vue-router";
+import { useStore } from "vuex";
 
 import HomeView from "./views/HomeView.vue";
 import RunView from "./views/RunView.vue";
 
+const waitForCheck = async (check) => {
+  while (!check()) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+};
+
+const beforeEnter = async (to, from) => {
+  const store = useStore();
+  if (!store.state.data) {
+    router.push({ name: "HOMEVIEW" });
+  }
+};
+
 const routes = [
   { name: "HOMEVIEW", path: "/", component: HomeView },
-  { name: "RUNVIEW", path: "/wpt/:filepath*", component: RunView, props: true },
+  {
+    name: "RUNVIEW",
+    path: "/wpt/:filepath*",
+    component: RunView,
+    props: true,
+    beforeEnter,
+  },
 ];
 
 const router = createRouter({
-  history: createMemoryHistory(),
+  history: createWebHistory(),
   routes,
 });
 

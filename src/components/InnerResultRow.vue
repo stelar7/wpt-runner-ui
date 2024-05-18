@@ -1,11 +1,8 @@
 <template>
-  <div class="resultRow" @click="pushPath()">
-    <b>{{ entryName }}</b>
+  <div class="innerResultRow">
+    <b>{{ props.name }}</b>
     <div class="statContainer">
-      <span>{{ passPercent }}%</span>
-      <span v-for="(count, name) in counts" :key="name" class="statRow">
-        {{ name }}: {{ count }}
-      </span>
+      <span>{{ statusTitle }}</span>
     </div>
   </div>
 </template>
@@ -16,35 +13,38 @@ import { useRouter } from "vue-router";
 import { computed } from "vue";
 import chroma from "chroma-js";
 const store = useStore();
-const props = defineProps(["path", "goBack", "isRoot"]);
+const props = defineProps(["path", "name"]);
 
-const pathEntry = store.getters.getFromPath(props.path);
-const entryName = pathEntry.parent.substring(
-  pathEntry.parent.lastIndexOf("/") + 1
-);
+const entryValues = store.getters.getFromPath(props.path);
 
-const counts = store.getters.resultValuesForPath(props.path);
-if (Object.values(counts).reduce((a, b) => a + b, 0) === 0) {
-  counts.total = 1;
-  if (pathEntry.status === "PASS") {
-    counts.passing = 1;
-  } else if (pathEntry.status === "FAIL") {
-    counts.failing = 1;
-  } else if (pathEntry.status === "ERROR") {
-    counts.errors = 1;
-  } else if (pathEntry.status === "CRASH") {
-    counts.crashing = 1;
-  } else if (pathEntry.status === "TIMEOUT") {
-    counts.timeout = 1;
-  } else if (pathEntry.status === "NOTRUN") {
-    counts.notrun = 1;
-  } else if (pathEntry.status === "PRECONDITION") {
-    counts.precondition = 1;
-  } else {
-    console.log("UNHANDLED STATUS AA" + pathEntry.status);
-  }
+var passPercent = 0;
+var statusTitle = "Failing";
+if (entryValues.passing.find((element) => element.name === props.name)) {
+  passPercent = 100;
+  statusTitle = "Passing";
+} else if (entryValues.failing.find((element) => element.name === props.name)) {
+  passPercent = 0;
+  statusTitle = "Failing";
+} else if (entryValues.notrun.find((element) => element.name === props.name)) {
+  passPercent = 0;
+  statusTitle = "Not Run";
+} else if (entryValues.errors.find((element) => element.name === props.name)) {
+  passPercent = 0;
+  statusTitle = "Error";
+} else if (
+  entryValues.crashing.find((element) => element.name === props.name)
+) {
+  passPercent = 0;
+  statusTitle = "Crashing";
+} else if (entryValues.timeout.find((element) => element.name === props.name)) {
+  passPercent = 0;
+  statusTitle = "Timeout";
+} else if (
+  entryValues.precondition.find((element) => element.name === props.name)
+) {
+  passPercent = 0;
+  statusTitle = "Precondition";
 }
-const passPercent = Math.round((counts.passing / counts.total) * 100);
 
 const router = useRouter();
 const pushPath = () => {
@@ -90,7 +90,7 @@ const itemGradient = computed(() => {
 </script>
 
 <style scoped>
-.resultRow {
+.innerResultRow {
   margin: 10px 0px;
   padding: 10px;
   border: 1px solid black;
@@ -100,7 +100,6 @@ const itemGradient = computed(() => {
 
   &:hover {
     opacity: 0.5;
-    cursor: pointer;
   }
 
   display: flex;
@@ -109,7 +108,7 @@ const itemGradient = computed(() => {
 
   .statContainer {
     display: grid;
-    grid-template-columns: repeat(9, minmax(130px, 1fr));
+    grid-template-columns: minmax(130px, 1fr);
     grid-template-rows: 1fr;
   }
 }

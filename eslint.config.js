@@ -1,12 +1,14 @@
 import globals from "globals";
-import pluginJs from "@eslint/js";
+import stylistic from "@stylistic/eslint-plugin";
 import tseslint from "typescript-eslint";
 import pluginVue from "eslint-plugin-vue";
 
-
 export default [
-  {languageOptions: { globals: globals.browser }},
-  pluginJs.configs.recommended,
-  ...tseslint.configs.recommended,
-  ...pluginVue.configs["flat/essential"],
+  { languageOptions: { globals: globals.browser } },
+  {
+    rules: {
+      "@stylistic/js/max-len": ["error", 180],
+      "@stylistic/js/indent": ["error", 4],
+    },
+  },
 ];

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@typescript-eslint/parser": "^5.62.0",
+    "chroma-js": "^2.4.2",
     "prettier": "^3.2.5",
     "prettier-eslint": "^16.3.0",
     "vue": "^3.4.21",
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.2.0",
+    "@stylistic/eslint-plugin": "^2.1.0",
     "@vitejs/plugin-vue": "^5.0.4",
     "eslint": "^8.57.0",
     "eslint-plugin-vue": "^9.26.0",

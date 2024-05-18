@@ -16,7 +16,7 @@ const store = createStore({
   },
   mutations: {
     setData(state, data) {
-      state.data = data;
+      state.data = Object.freeze(data);
     },
     addPath(state, path) {
       state.currentPath.push(path);
@@ -37,11 +37,17 @@ const store = createStore({
   },
   getters: {
     getFromPath: (state) => (path: Array<string>) => {
-      if (!state.data) return;
+      const pathString = "/" + path.join("/");
 
       let current = state.data.results;
       for (const key of path) {
-        current = current.children[key];
+        if (current.children[key]) {
+          current = current.children[key];
+        } else {
+          current = current.results.find(
+            (result) => result.parent === pathString
+          );
+        }
       }
 
       return current;
@@ -78,6 +84,22 @@ const store = createStore({
       children["total"] = Object.values(children).reduce((a, b) => a + b, 0);
 
       return children;
+    },
+
+    resultValuesForPath: () => (path: Array<string>) => {
+      const data = store.getters.getFromPath(path);
+      if (!data) return [];
+
+      const results = {};
+      for (const key in data) {
+        if (Array.isArray(data[key])) {
+          results[key] = data[key].length;
+        }
+      }
+
+      results["total"] = Object.values(results).reduce((a, b) => a + b, 0);
+
+      return results;
     },
 
     resultKeysFromPath: () => (path: Array<string>) => {
