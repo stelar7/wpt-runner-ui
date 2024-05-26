@@ -170,7 +170,7 @@ const doSort = () => {
       return bPercent - aPercent;
     } else {
       const aValue = aCounts[sortMethod.value];
-      const bValue = bCounts([...pathToUse, b])[sortMethod.value];
+      const bValue = bCounts[sortMethod.value];
       return bValue - aValue;
     }
   });
