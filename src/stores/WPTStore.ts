@@ -29,7 +29,7 @@ const store = createStore({
     async fetchWPTData(context) {
       if (context.state.data) return;
 
-      const response = await fetch("https://wpt.stelar7.no/runs/latest.json");
+      const response = await fetch("https://wpt.stelar7.no/data/runs/latest.json");
 
       const data = await response.json();
       context.commit("setData", data);
