@@ -141,6 +141,12 @@ const doSort = () => {
         aCounts.timeout = 1;
       } else if (a.status === "ERROR") {
         aCounts.error = 1;
+      } else if (a.status === "CRASH") {
+        aCounts.crashing = 1;
+      } else if (a.status === "NOTRUN") {
+        aCounts.notrun = 1;
+      } else if (a.status === "PRECONDITION") {
+        aCounts.precondition = 1;
       } else {
         console.log("UNHANDLED STATUS VV" + a.status);
       }
@@ -156,6 +162,12 @@ const doSort = () => {
         bCounts.timeout = 1;
       } else if (b.status === "ERROR") {
         bCounts.error = 1;
+      } else if (b.status === "CRASH") {
+        bCounts.crashing = 1;
+      } else if (b.status === "NOTRUN") {
+        bCounts.notrun = 1;
+      } else if (b.status === "PRECONDITION") {
+        bCounts.precondition = 1;
       } else {
         console.log("UNHANDLED STATUS CC " + b.status);
       }
