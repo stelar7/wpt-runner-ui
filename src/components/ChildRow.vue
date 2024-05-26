@@ -1,11 +1,14 @@
 <template>
   <div class="childRow" @click="pushPath()">
-    <span>
-      <b v-if="!props.goBack">{{ props.path[props.path.length - 1] }}</b>
-      <template v-else>
-        <b v-if="!props.isRoot">> PARENT</b>
-        <b v-else>ROOT</b>
-      </template>
+    <div v-if="!props.goBack" class="nameColumn">
+      <span
+        ><b>{{ props.path[props.path.length - 1] }}</b></span
+      >
+      <span><a @click.stop.prevent :href="githubLink">(Github)</a></span>
+    </div>
+    <span v-else>
+      <b v-if="!props.isRoot">> PARENT</b>
+      <b v-else>ROOT</b>
     </span>
     <div class="statContainer">
       <span>{{ passPercent }}%</span>
@@ -23,6 +26,9 @@ import { computed } from "vue";
 import chroma from "chroma-js";
 const store = useStore();
 const props = defineProps(["path", "goBack", "isRoot"]);
+
+const githubLink = `https://github.com/web-platform-tests/wpt/tree/master/${props.path.join("/")}`;
+
 const counts = store.getters.countsForPath(props.path);
 const passPercent = Math.round((counts.passing / counts.total) * 100);
 
@@ -78,14 +84,28 @@ const itemGradient = computed(() => {
   background: v-bind("itemGradient.background");
   color: v-bind("itemGradient.color");
 
-  &:hover {
-    opacity: 0.5;
-    cursor: pointer;
-  }
-
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  .nameColumn {
+    display: flex;
+    gap: 5px;
+
+    a {
+      color: v-bind("itemGradient.color");
+      
+      &:hover {
+        opacity: 0.7;
+        cursor: pointer;
+      }
+    }
+  }
+
+  &:hover:not(:has(a:hover)) {
+    opacity: 0.5;
+    cursor: pointer;
+  }
 
   .statContainer {
     display: grid;

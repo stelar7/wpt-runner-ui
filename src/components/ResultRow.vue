@@ -1,6 +1,12 @@
 <template>
   <div class="resultRow" @click="pushPath()">
-    <b>{{ entryName }}</b>
+    <div class="nameColumn">
+      <span
+        ><b>{{ entryName }}</b></span
+      >
+      <span><a @click.stop.prevent :href="githubLink">(Github)</a></span>
+    </div>
+
     <div class="statContainer">
       <span>{{ passPercent }}%</span>
       <span v-for="(count, name) in counts" :key="name" class="statRow">
@@ -17,6 +23,8 @@ import { computed } from "vue";
 import chroma from "chroma-js";
 const store = useStore();
 const props = defineProps(["path", "goBack", "isRoot"]);
+
+const githubLink = `https://github.com/web-platform-tests/wpt/tree/master/${props.path.join("/")}`;
 
 const pathEntry = store.getters.getFromPath(props.path);
 const entryName = pathEntry.parent.substring(
@@ -98,7 +106,16 @@ const itemGradient = computed(() => {
   background: v-bind("itemGradient.background");
   color: v-bind("itemGradient.color");
 
-  &:hover {
+  .nameColumn {
+    display: flex;
+    gap: 5px;
+
+    a {
+      color: v-bind("itemGradient.color");
+    }
+  }
+
+  &:hover:not(:has(a:hover)) {
     opacity: 0.5;
     cursor: pointer;
   }
