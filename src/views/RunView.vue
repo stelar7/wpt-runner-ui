@@ -73,8 +73,7 @@ const sortedResults = ref([]);
 const allResultsInner = store.getters.getFromPath(pathToUse);
 const sortedResultsInner = ref([]);
 
-const sortMethod = ref();
-watch(sortMethod, () => {
+const doSort = () => {
   function typeToValue(type) {
     if (allResultsInner.passing.find((element) => element.name === type)) {
       return 1;
@@ -198,7 +197,9 @@ watch(sortMethod, () => {
       return bValue - aValue;
     }
   });
-});
+};
 
-sortMethod.value = "percent";
+const sortMethod = ref("percent");
+watch(sortMethod, () => doSort());
+doSort();
 </script>
