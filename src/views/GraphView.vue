@@ -2,8 +2,9 @@
   <div class="graph-view">
     <div>
       <h1>Graph View</h1>
+      <p v-if="loadingGraphData">Loading graph data...</p>
     </div>
-    <div class="chart-container">
+    <div class="chart-container" :key="updateKey">
       <Line :data="data" :options="options" />
     </div>
   </div>
@@ -24,7 +25,7 @@ import {
   Colors,
 } from "chart.js";
 import { Line } from "vue-chartjs";
-import { ref } from "vue";
+import { nextTick, ref } from "vue";
 Chart.register(
   Title,
   Tooltip,
@@ -82,18 +83,28 @@ const data = ref({
   datasets: [],
 });
 
-const allFiles = store.state.fileList;
+const updateKey = ref(1);
 
-for (let file of allFiles) {
-  await store.dispatch("fetchWPTData", file.name);
+const loadingGraphData = ref(true);
 
-  const fileData = store.getters.countsForPath(pathToUse, false, file.name);
+nextTick(async () => {
+  const allFiles = store.state.fileList;
+  for (let file of allFiles) {
+    await store.dispatch("fetchWPTData", file.name);
 
-  data.value.datasets.push({
-    data: fileData,
-    fill: true,
-  });
-}
+    const fileData = store.getters.countsForPath(pathToUse, false, file.name);
+
+    data.value.datasets.push({
+      data: fileData,
+      fill: true,
+    });
+
+    // Need to update something in the UI for the graph to update, so we use a :key on the parent
+    updateKey.value += 1;
+  }
+
+  loadingGraphData.value = false;
+});
 </script>
 
 <style scoped>

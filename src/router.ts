@@ -13,7 +13,7 @@ const waitForCheck = async (check) => {
 
 const beforeEnter = async (to, from) => {
   const store = useStore();
-  if (!store.state.data) {
+  if (!store.state.data["latest.json"]) {
     router.push({ name: "HOMEVIEW" });
   }
 };
