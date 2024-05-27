@@ -23,15 +23,19 @@ import {
   PointElement,
   Filler,
   Colors,
+  TimeScale,
 } from "chart.js";
+import "chartjs-adapter-moment";
+import moment from "moment";
 import { Line } from "vue-chartjs";
-import { nextTick, ref } from "vue";
+import { nextTick, ref, shallowRef } from "vue";
 Chart.register(
   Title,
   Tooltip,
   Legend,
   Filler,
   Colors,
+  TimeScale,
   LineElement,
   LinearScale,
   CategoryScale,
@@ -39,7 +43,7 @@ Chart.register(
 );
 
 const props = defineProps(["filepath"]);
-const basePath = props.filepath;
+const basePath = props.filepath?.length > 0 ? props.filepath : undefined;
 const pathToUse = basePath === undefined ? [] : basePath;
 
 const store = useStore();
@@ -49,8 +53,6 @@ const options = {
   plugins: {
     title: {
       display: false,
-      text: (ctx) =>
-        "Chart.js Line Chart - stacked=" + ctx.chart.options.scales.y.stacked,
     },
     tooltip: {
       mode: "index",
@@ -66,12 +68,14 @@ const options = {
   },
   scales: {
     x: {
+      type: "time",
       title: {
         display: false,
       },
     },
     y: {
       stacked: true,
+      beginAtZero: true,
       title: {
         display: false,
       },
@@ -79,9 +83,17 @@ const options = {
   },
 };
 
-const data = ref({
+const data = shallowRef({
   datasets: [],
 });
+
+for (let i = 0; i < 8; i++) {
+  data.value.datasets.push({
+    data: [],
+    fill: true,
+    label: store.getters.indexToType(i),
+  });
+}
 
 const updateKey = ref(1);
 
@@ -94,10 +106,16 @@ nextTick(async () => {
 
     const fileData = store.getters.countsForPath(pathToUse, false, file.name);
 
-    data.value.datasets.push({
-      data: fileData,
-      fill: true,
-    });
+    const timestamp = file.name.split(".")[0];
+    const date = moment(+timestamp);
+
+    for (let keyName in fileData) {
+      const key = store.getters.typeToIndex(keyName);
+      data.value.datasets[key].data.push({
+        x: date,
+        y: fileData[keyName],
+      });
+    }
 
     // Need to update something in the UI for the graph to update, so we use a :key on the parent
     updateKey.value += 1;

@@ -158,6 +158,46 @@ const store = createStore({
 
       return results;
     },
+    typeToIndex: () => (type) => {
+      switch (type) {
+        case "passing":
+          return 0;
+        case "failing":
+          return 1;
+        case "notrun":
+          return 2;
+        case "error":
+          return 3;
+        case "crashing":
+          return 4;
+        case "timeout":
+          return 5;
+        case "precondition":
+          return 6;
+        default:
+          return 7;
+      }
+    },
+    indexToType: () => (index) => {
+      switch (index) {
+        case 0:
+          return "passing";
+        case 1:
+          return "failing";
+        case 2:
+          return "notrun";
+        case 3:
+          return "error";
+        case 4:
+          return "crashing";
+        case 5:
+          return "timeout";
+        case 6:
+          return "precondition";
+        default:
+          return "Unknown type";
+      }
+    },
   },
 });
 
