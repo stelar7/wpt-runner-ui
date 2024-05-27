@@ -72,7 +72,7 @@ const store = createStore({
         children.push(key);
       }
 
-      children.sort((a, b) => a.localeCompare(b));
+      children.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 
       return children;
     },
@@ -126,7 +126,7 @@ const store = createStore({
         results.push(data.results[key]);
       }
 
-      results.sort((a, b) => a.parent.localeCompare(b.parent));
+      results.sort((a, b) => a.parent.localeCompare(b.parent, undefined, { numeric: true }));
 
       return results;
     },

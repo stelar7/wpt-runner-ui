@@ -122,7 +122,7 @@ const doSort = () => {
     const aCounts = store.getters.countsForPath([...pathToUse, a]);
     const bCounts = store.getters.countsForPath([...pathToUse, b]);
     if (sortMethod.value === "name") {
-      return a.localeCompare(b);
+      return a.localeCompare(b, undefined, { numeric: true });
     } else if (sortMethod.value === "percent") {
       const aPercent = Math.round((aCounts.passing / aCounts.total) * 100);
       const bPercent = Math.round((bCounts.passing / bCounts.total) * 100);
@@ -186,7 +186,7 @@ const doSort = () => {
     }
 
     if (sortMethod.value === "name") {
-      return a.parent.localeCompare(b.parent);
+      return a.parent.localeCompare(b.parent, undefined, { numeric: true });
     } else if (sortMethod.value === "percent") {
       const aPercent = Math.round((aCounts.passing / aCounts.total) * 100);
       const bPercent = Math.round((bCounts.passing / bCounts.total) * 100);
@@ -216,7 +216,7 @@ const doSort = () => {
     const bValue = typeToValue(b.name)!;
 
     if (sortMethod.value === "name") {
-      return a.name.localeCompare(b.name);
+      return a.name.localeCompare(b.name, undefined, { numeric: true });
     } else {
       return bValue - aValue;
     }
