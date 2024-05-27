@@ -22,6 +22,7 @@ watch(
       return;
     }
 
+    store.dispatch("setRedirectUrl", null);
     router.push(redirect);
   }
 );
