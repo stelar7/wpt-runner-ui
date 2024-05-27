@@ -12,54 +12,70 @@ const COUNT_KEYS = [
 
 const store = createStore({
   state() {
-    return { currentPath: [], data: null, sortingMode: "name" };
+    return { data: {}, sortingMode: "name", fileList: [] };
   },
   mutations: {
-    setData(state, data) {
-      state.data = Object.freeze(data);
-    },
-    addPath(state, path) {
-      state.currentPath.push(path);
-    },
-    popPath(state) {
-      state.currentPath.pop();
+    setData(state, { filename, data }) {
+      state.data[filename] = Object.freeze(data);
     },
     setSortingMode(state, mode) {
       state.sortingMode = mode;
-    }
+    },
+    setFileList(state, fileList) {
+      state.fileList = fileList;
+    },
   },
   actions: {
-    async fetchWPTData(context) {
-      if (context.state.data) return;
+    async fetchFileList(context) {
+      const url = "https://wpt.stelar7.no/data/runs/";
+      const response = await fetch(url, {
+        headers: { Accept: "application/json" },
+      });
+      const allFiles = await response.json();
 
-      const response = await fetch(
-        "https://wpt.stelar7.no/data/runs/latest.json"
-      );
+      const filteredFiles = allFiles
+        .filter((file) => file.name.endsWith(".json"))
+        .filter((file) => file.name !== "latest.json")
+        .filter((file) => file.name !== "report.json")
+        .sort((a, b) =>
+          b.name.localeCompare(a.name, undefined, { numeric: true })
+        );
 
+      context.commit("setFileList", filteredFiles);
+    },
+    async fetchWPTData(context, filename = "latest.json") {
+      if (context.state.data[filename]) return;
+
+      const url = `https://wpt.stelar7.no/data/runs/${filename}`;
+
+      const response = await fetch(url);
       const data = await response.json();
-      context.commit("setData", data);
+
+      context.commit("setData", { filename, data });
     },
     updateSortingMode(context, mode) {
       context.commit("setSortingMode", mode);
     },
   },
   getters: {
-    getFromPath: (state) => (path: Array<string>) => {
-      const pathString = "/" + path.join("/");
+    getFromPath:
+      (state) =>
+      (path: Array<string>, fileToUse: string = "latest.json") => {
+        const pathString = "/" + path.join("/");
 
-      let current = state.data.results;
-      for (const key of path) {
-        if (current.children[key]) {
-          current = current.children[key];
-        } else {
-          current = current.results.find(
-            (result) => result.parent === pathString
-          );
+        let current = state.data[fileToUse].results;
+        for (const key of path) {
+          if (current.children[key]) {
+            current = current.children[key];
+          } else {
+            current = current.results.find(
+              (result) => result.parent === pathString
+            );
+          }
         }
-      }
 
-      return current;
-    },
+        return current;
+      },
 
     childKeysFromPath: () => (path: Array<string>) => {
       const data = store.getters.getFromPath(path);
@@ -79,8 +95,12 @@ const store = createStore({
 
     countsForPath:
       () =>
-      (path: Array<string>, includeTotal: boolean = true) => {
-        const data = store.getters.getFromPath(path);
+      (
+        path: Array<string>,
+        includeTotal: boolean = true,
+        fileToUse = "latest.json"
+      ) => {
+        const data = store.getters.getFromPath(path, fileToUse);
         if (!data) return [];
 
         const children = {};
@@ -126,7 +146,9 @@ const store = createStore({
         results.push(data.results[key]);
       }
 
-      results.sort((a, b) => a.parent.localeCompare(b.parent, undefined, { numeric: true }));
+      results.sort((a, b) =>
+        a.parent.localeCompare(b.parent, undefined, { numeric: true })
+      );
 
       return results;
     },

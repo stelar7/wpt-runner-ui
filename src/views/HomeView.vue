@@ -8,12 +8,13 @@ import { useRouter } from "vue-router";
 import { watch } from "vue";
 
 const store = useStore();
+store.dispatch("fetchFileList");
 store.dispatch("fetchWPTData");
 
 const router = useRouter();
 
 watch(
-  () => store.state.data,
+  () => store.state.data["latest.json"],
   () => router.push({ name: "RUNVIEW" })
 );
 </script>

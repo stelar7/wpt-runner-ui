@@ -24,6 +24,7 @@ import {
   Colors,
 } from "chart.js";
 import { Line } from "vue-chartjs";
+import { ref } from "vue";
 Chart.register(
   Title,
   Tooltip,
@@ -41,7 +42,6 @@ const basePath = props.filepath;
 const pathToUse = basePath === undefined ? [] : basePath;
 
 const store = useStore();
-const currentPathScores = store.getters.countsForPath(pathToUse, false);
 
 const options = {
   responsive: true,
@@ -78,14 +78,22 @@ const options = {
   },
 };
 
-const data = {
-  datasets: [
-    {
-      data: currentPathScores,
-      fill: true,
-    },
-  ],
-};
+const data = ref({
+  datasets: [],
+});
+
+const allFiles = store.state.fileList;
+
+for (let file of allFiles) {
+  await store.dispatch("fetchWPTData", file.name);
+
+  const fileData = store.getters.countsForPath(pathToUse, false, file.name);
+
+  data.value.datasets.push({
+    data: fileData,
+    fill: true,
+  });
+}
 </script>
 
 <style scoped>
