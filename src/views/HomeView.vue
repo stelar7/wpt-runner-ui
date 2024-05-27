@@ -13,17 +13,21 @@ store.dispatch("fetchWPTData");
 
 const router = useRouter();
 
+if (store.state.data["latest.json"] != null) {
+  router.replace({ name: "RUNVIEW" });
+}
+
 watch(
   () => store.state.data["latest.json"],
   () => {
     const redirect = store.state.redirectUrl;
     if (redirect == null) {
-      router.push({ name: "RUNVIEW" });
+      router.replace({ name: "RUNVIEW" });
       return;
     }
 
     store.dispatch("setRedirectUrl", null);
-    router.push(redirect);
+    router.replace(redirect);
   }
 );
 </script>

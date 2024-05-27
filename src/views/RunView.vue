@@ -47,9 +47,8 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 const props = defineProps(["filepath"]);
-const basePath = props.filepath;
+const basePath = props.filepath?.length > 0 ? props.filepath : undefined;
 
-//const basePath = ["quirks"];
 const nextPath = (name) => {
   if (basePath === undefined) return [name];
   return [...basePath, name];
