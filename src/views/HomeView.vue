@@ -15,7 +15,15 @@ const router = useRouter();
 
 watch(
   () => store.state.data["latest.json"],
-  () => router.push({ name: "RUNVIEW" })
+  () => {
+    const redirect = store.state.redirectUrl;
+    if (redirect == null) {
+      router.push({ name: "RUNVIEW" });
+      return;
+    }
+
+    router.push(redirect);
+  }
 );
 </script>
 

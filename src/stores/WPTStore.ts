@@ -12,7 +12,7 @@ const COUNT_KEYS = [
 
 const store = createStore({
   state() {
-    return { data: {}, sortingMode: "name", fileList: [] };
+    return { data: {}, sortingMode: "name", fileList: [], redirectUrl: null };
   },
   mutations: {
     setData(state, { filename, data }) {
@@ -24,8 +24,14 @@ const store = createStore({
     setFileList(state, fileList) {
       state.fileList = fileList;
     },
+    setRedirectUrl(state, to) {
+      state.redirectUrl = to;
+    },
   },
   actions: {
+    setRedirectUrl(context, to) {
+      context.commit("setRedirectUrl", to);
+    },
     async fetchFileList(context) {
       const url = "https://wpt.stelar7.no/data/runs/";
       const response = await fetch(url, {
