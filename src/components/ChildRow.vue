@@ -4,7 +4,7 @@
       <span
         ><b>{{ props.path[props.path.length - 1] }}</b></span
       >
-      <span><a @click.stop.prevent :href="githubLink">(Github)</a></span>
+      <span><a @click.stop :href="githubLink">(Github)</a></span>
     </div>
     <span v-else>
       <b v-if="!props.isRoot">> PARENT</b>

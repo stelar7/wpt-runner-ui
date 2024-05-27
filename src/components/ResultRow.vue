@@ -4,7 +4,7 @@
       <span
         ><b>{{ entryName }}</b></span
       >
-      <span><a @click.stop.prevent :href="githubLink">(Github)</a></span>
+      <span><a @click.stop :href="githubLink">(Github)</a></span>
     </div>
 
     <div class="statContainer">
