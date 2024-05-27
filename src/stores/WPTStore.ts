@@ -12,7 +12,7 @@ const COUNT_KEYS = [
 
 const store = createStore({
   state() {
-    return { currentPath: [], data: null };
+    return { currentPath: [], data: null, sortingMode: "name" };
   },
   mutations: {
     setData(state, data) {
@@ -24,15 +24,23 @@ const store = createStore({
     popPath(state) {
       state.currentPath.pop();
     },
+    setSortingMode(state, mode) {
+      state.sortingMode = mode;
+    }
   },
   actions: {
     async fetchWPTData(context) {
       if (context.state.data) return;
 
-      const response = await fetch("https://wpt.stelar7.no/data/runs/latest.json");
+      const response = await fetch(
+        "https://wpt.stelar7.no/data/runs/latest.json"
+      );
 
       const data = await response.json();
       context.commit("setData", data);
+    },
+    updateSortingMode(context, mode) {
+      context.commit("setSortingMode", mode);
     },
   },
   getters: {
@@ -69,24 +77,29 @@ const store = createStore({
       return children;
     },
 
-    countsForPath: () => (path: Array<string>, includeTotal: boolean = true) => {
-      const data = store.getters.getFromPath(path);
-      if (!data) return [];
+    countsForPath:
+      () =>
+      (path: Array<string>, includeTotal: boolean = true) => {
+        const data = store.getters.getFromPath(path);
+        if (!data) return [];
 
-      const children = {};
-      for (const key in data.children) {
-        if (!COUNT_KEYS.includes(key)) continue;
+        const children = {};
+        for (const key in data.children) {
+          if (!COUNT_KEYS.includes(key)) continue;
 
-        const renamedKey = key.replace("Count", "");
-        children[renamedKey] = data[key];
-      }
+          const renamedKey = key.replace("Count", "");
+          children[renamedKey] = data[key];
+        }
 
-      if (includeTotal) {
-        children["total"] = Object.values(children).reduce((a, b) => a + b, 0);
-      }
+        if (includeTotal) {
+          children["total"] = Object.values(children).reduce(
+            (a, b) => a + b,
+            0
+          );
+        }
 
-      return children;
-    },
+        return children;
+      },
 
     resultValuesForPath: () => (path: Array<string>) => {
       const data = store.getters.getFromPath(path);

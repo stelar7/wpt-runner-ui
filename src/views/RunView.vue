@@ -223,8 +223,11 @@ const doSort = () => {
   });
 };
 
-const sortMethod = ref("percent");
-watch(sortMethod, () => doSort());
+const sortMethod = ref(store.state.sortingMode);
+watch(sortMethod, (newMode) => {
+  doSort();
+  store.dispatch("updateSortingMode", newMode);
+});
 doSort();
 </script>
 
