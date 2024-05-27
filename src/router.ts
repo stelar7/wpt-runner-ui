@@ -3,6 +3,7 @@ import { useStore } from "vuex";
 
 import HomeView from "./views/HomeView.vue";
 import RunView from "./views/RunView.vue";
+import GraphView from "./views/GraphView.vue";
 
 const waitForCheck = async (check) => {
   while (!check()) {
@@ -23,6 +24,13 @@ const routes = [
     name: "RUNVIEW",
     path: "/wpt/:filepath*",
     component: RunView,
+    props: true,
+    beforeEnter,
+  },
+  {
+    name: "GRAPHVIEW",
+    path: "/graph/:filepath*",
+    component: GraphView,
     props: true,
     beforeEnter,
   },

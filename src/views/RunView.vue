@@ -1,18 +1,23 @@
 <template>
-  <div>
-    <span>sort by: </span>
-    <select v-model="sortMethod">
-      <option>name</option>
-      <option>percent</option>
-      <option>passing</option>
-      <option>error</option>
-      <option>failing</option>
-      <option>crashing</option>
-      <option>timeout</option>
-      <option>notrun</option>
-      <option>precondition</option>
-      <option>total</option>
-    </select>
+  <div class="header">
+    <div>
+      <span>sort by: </span>
+      <select v-model="sortMethod">
+        <option>name</option>
+        <option>percent</option>
+        <option>passing</option>
+        <option>error</option>
+        <option>failing</option>
+        <option>crashing</option>
+        <option>timeout</option>
+        <option>notrun</option>
+        <option>precondition</option>
+        <option>total</option>
+      </select>
+    </div>
+    <div>
+      <span class="graphLink" @click="gotoGraphPage()">View graphs</span>
+    </div>
   </div>
   <ItemRow :path="prevPath()" :go-back="true" :is-root="isRoot" />
   <span v-if="sortedChildren.length > 0">Subfolders:</span>
@@ -38,9 +43,12 @@ import ChildRow from "../components/ChildRow.vue";
 import ResultRow from "../components/ResultRow.vue";
 import InnerResultRow from "../components/InnerResultRow.vue";
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const props = defineProps(["filepath"]);
 const basePath = props.filepath;
+
 //const basePath = ["quirks"];
 const nextPath = (name) => {
   if (basePath === undefined) return [name];
@@ -58,6 +66,10 @@ const nextResultPath = (parent) => {
 const prevPath = () => {
   if (basePath === undefined) return [];
   return basePath.slice(0, -1);
+};
+
+const gotoGraphPage = () => {
+  router.push({ name: "GRAPHVIEW", params: { filepath: basePath } });
 };
 
 const isRoot = basePath === undefined || basePath.length === 0;
@@ -215,3 +227,18 @@ const sortMethod = ref("percent");
 watch(sortMethod, () => doSort());
 doSort();
 </script>
+
+<style scoped>
+.header {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  gap: 10px;
+
+  .graphLink {
+    cursor: pointer;
+    border: 1px solid wheat;
+    padding: 5px;
+  }
+}
+</style>

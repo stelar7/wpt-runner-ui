@@ -69,7 +69,7 @@ const store = createStore({
       return children;
     },
 
-    countsForPath: () => (path: Array<string>) => {
+    countsForPath: () => (path: Array<string>, includeTotal: boolean = true) => {
       const data = store.getters.getFromPath(path);
       if (!data) return [];
 
@@ -81,7 +81,9 @@ const store = createStore({
         children[renamedKey] = data[key];
       }
 
-      children["total"] = Object.values(children).reduce((a, b) => a + b, 0);
+      if (includeTotal) {
+        children["total"] = Object.values(children).reduce((a, b) => a + b, 0);
+      }
 
       return children;
     },
